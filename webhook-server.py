@@ -1,40 +1,20 @@
 #!/usr/bin/env python3
 from http.server import HTTPServer, BaseHTTPRequestHandler
 import subprocess
-import json
-import hmac
-import hashlib
 import os
-
-SECRET = os.environ.get('WEBHOOK_SECRET', '')
 
 class WebhookHandler(BaseHTTPRequestHandler):
     def do_POST(self):
-        content_length = int(self.headers.get('Content-Length', 0))
-        body = self.rfile.read(content_length)
-        
-        # Verify signature if secret is set
-        if SECRET:
-            signature = self.headers.get('X-Hub-Signature-256', '')
-            expected = 'sha256=' + hmac.new(SECRET.encode(), body, hashlib.sha256).hexdigest()
-            if not hmac.compare_digest(signature, expected):
-                self.send_response(403)
-                self.end_headers()
-                return
-        
-        # Run deploy script
         try:
             result = subprocess.run(
-                ['/app/deploy.sh'],
+                ['/home/alex/docker/landing-page/deploy.sh'],
                 capture_output=True,
                 text=True,
                 timeout=30
             )
-            print(f"Deploy output: {result.stdout}")
-            if result.returncode == 0:
-                self.send_response(200)
-            else:
-                self.send_response(500)
+            print(f"Deploy stdout: {result.stdout}")
+            print(f"Deploy stderr: {result.stderr}")
+            self.send_response(200)
         except Exception as e:
             print(f"Deploy error: {e}")
             self.send_response(500)
