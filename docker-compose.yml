@@ -1,4 +1,13 @@
 services:
+  web:
+    image: nginx:alpine
+    container_name: landing-page
+    restart: unless-stopped
+    volumes:
+      - /home/alex/docker/landing-page/index.html:/usr/share/nginx/html/index.html:ro
+    networks:
+      - proxy
+
   webhook:
     build: .
     container_name: landing-page-webhook
@@ -9,3 +18,7 @@ services:
       - /home/alex/docker/landing-page:/home/alex/docker/landing-page
       - /var/run/docker.sock:/var/run/docker.sock
     working_dir: /home/alex/docker/landing-page
+
+networks:
+  proxy:
+    external: true
