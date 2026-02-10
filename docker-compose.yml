@@ -1,0 +1,11 @@
+services:
+  webhook:
+    build: .
+    container_name: landing-page-webhook
+    restart: unless-stopped
+    ports:
+      - "9999:9999"
+    volumes:
+      - /home/alex/docker/landing-page:/home/alex/docker/landing-page
+      - /var/run/docker.sock:/var/run/docker.sock
+    working_dir: /home/alex/docker/landing-page
